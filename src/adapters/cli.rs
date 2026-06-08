@@ -1,10 +1,15 @@
 use std::io::{self, BufRead, Write};
 
 use crate::domain::{Lexer, Token};
-use crate::ports::LexerPort;
 
 /// CLI adapter that reads from stdin and writes tokenized output.
 pub struct CliAdapter;
+
+impl Default for CliAdapter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl CliAdapter {
     pub fn new() -> Self {

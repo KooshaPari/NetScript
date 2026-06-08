@@ -1,5 +1,5 @@
-use netscript::Lexer;
 use insta::assert_debug_snapshot;
+use netscript::Lexer;
 
 #[test]
 fn snapshot_simple_assignment() {

@@ -20,9 +20,6 @@ proptest! {
     fn integer_tokenization(input in "[0-9]{1,10}") {
         let mut lexer = Lexer::new(&input);
         let token = lexer.next_token();
-        match token.token_type {
-            TokenType::Integer(_) => {},
-            _ => {}
-        }
+        if let TokenType::Integer(_) = token.token_type {}
     }
 }

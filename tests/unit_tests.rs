@@ -113,7 +113,11 @@ fn test_booleans() {
 fn test_simple_assignment() {
     let input = "let x = 42;";
     let mut lexer = Lexer::new(input);
-    let tokens: Vec<TokenType> = lexer.tokenize().iter().map(|t| t.token_type.clone()).collect();
+    let tokens: Vec<TokenType> = lexer
+        .tokenize()
+        .iter()
+        .map(|t| t.token_type.clone())
+        .collect();
     let expected = vec![
         TokenType::Let,
         TokenType::Identifier("x".to_string()),
@@ -129,7 +133,11 @@ fn test_simple_assignment() {
 fn test_function_call() {
     let input = "print(\"hello\");";
     let mut lexer = Lexer::new(input);
-    let tokens: Vec<TokenType> = lexer.tokenize().iter().map(|t| t.token_type.clone()).collect();
+    let tokens: Vec<TokenType> = lexer
+        .tokenize()
+        .iter()
+        .map(|t| t.token_type.clone())
+        .collect();
     let expected = vec![
         TokenType::Print,
         TokenType::LeftParen,
@@ -145,7 +153,11 @@ fn test_function_call() {
 fn test_if_statement() {
     let input = "if x > 0 { return 1; }";
     let mut lexer = Lexer::new(input);
-    let tokens: Vec<TokenType> = lexer.tokenize().iter().map(|t| t.token_type.clone()).collect();
+    let tokens: Vec<TokenType> = lexer
+        .tokenize()
+        .iter()
+        .map(|t| t.token_type.clone())
+        .collect();
     let expected = vec![
         TokenType::If,
         TokenType::Identifier("x".to_string()),
@@ -165,7 +177,11 @@ fn test_if_statement() {
 fn test_comments_skipped() {
     let input = "let x = 1; // this is a comment\nlet y = 2;";
     let mut lexer = Lexer::new(input);
-    let tokens: Vec<TokenType> = lexer.tokenize().iter().map(|t| t.token_type.clone()).collect();
+    let tokens: Vec<TokenType> = lexer
+        .tokenize()
+        .iter()
+        .map(|t| t.token_type.clone())
+        .collect();
     assert!(tokens.contains(&TokenType::Let));
     assert!(tokens.contains(&TokenType::Identifier("x".to_string())));
     assert!(tokens.contains(&TokenType::Identifier("y".to_string())));

@@ -6,12 +6,12 @@
 //! - `adapters` — concrete implementations (CliAdapter)
 //! - `app` — composition root (App)
 
-pub mod domain;
-pub mod ports;
 pub mod adapters;
 pub mod app;
+pub mod domain;
+pub mod ports;
 
-pub use domain::{Lexer, Token, TokenType};
-pub use ports::{LexerPort, Tokenizer};
 pub use adapters::CliAdapter;
 pub use app::App;
+pub use domain::{Lexer, Token, TokenType};
+pub use ports::{LexerPort, Tokenizer};
