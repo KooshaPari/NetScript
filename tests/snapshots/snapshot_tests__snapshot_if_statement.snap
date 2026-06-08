@@ -1,0 +1,62 @@
+---
+source: tests/snapshot_tests.rs
+expression: tokens
+---
+[
+    Token {
+        token_type: If,
+        line: 1,
+        column: 3,
+    },
+    Token {
+        token_type: Identifier(
+            "x",
+        ),
+        line: 1,
+        column: 5,
+    },
+    Token {
+        token_type: Greater,
+        line: 1,
+        column: 6,
+    },
+    Token {
+        token_type: Integer(
+            0,
+        ),
+        line: 1,
+        column: 9,
+    },
+    Token {
+        token_type: LeftBrace,
+        line: 1,
+        column: 10,
+    },
+    Token {
+        token_type: Return,
+        line: 1,
+        column: 18,
+    },
+    Token {
+        token_type: Integer(
+            1,
+        ),
+        line: 1,
+        column: 20,
+    },
+    Token {
+        token_type: Semicolon,
+        line: 1,
+        column: 20,
+    },
+    Token {
+        token_type: RightBrace,
+        line: 1,
+        column: 22,
+    },
+    Token {
+        token_type: Eof,
+        line: 1,
+        column: 23,
+    },
+]

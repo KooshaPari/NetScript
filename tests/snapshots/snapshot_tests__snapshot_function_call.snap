@@ -1,0 +1,38 @@
+---
+source: tests/snapshot_tests.rs
+expression: tokens
+---
+[
+    Token {
+        token_type: Print,
+        line: 1,
+        column: 6,
+    },
+    Token {
+        token_type: LeftParen,
+        line: 1,
+        column: 6,
+    },
+    Token {
+        token_type: String(
+            "hello",
+        ),
+        line: 1,
+        column: 13,
+    },
+    Token {
+        token_type: RightParen,
+        line: 1,
+        column: 14,
+    },
+    Token {
+        token_type: Semicolon,
+        line: 1,
+        column: 15,
+    },
+    Token {
+        token_type: Eof,
+        line: 1,
+        column: 16,
+    },
+]

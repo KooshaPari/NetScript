@@ -4,7 +4,14 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
+resolver = "2"
 
 [dependencies]
 
-[workspace]
+[dev-dependencies]
+proptest = "1.6.0"
+insta = { version = "1.42.0", features = ["yaml"] }
+
+[[bin]]
+name = "netscript"
+path = "src/main.rs"

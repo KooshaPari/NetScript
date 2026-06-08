@@ -1,11 +1,19 @@
 //! NetScript CLI entry point.
-//!
-//! The lexer, token types, and tests live in `lib.rs`. This binary is a
-//! thin shim so future parsing/REPL work can grow here without
-//! duplicating the lexer, and so the lexer is reusable as a library
-//! (e.g. for embedding in other tools, or for a forthcoming `netscript fmt`).
 
-fn main() {
-    println!("NetScript Lexer");
-    println!("Usage: echo 'let x = 42;' | netscript");
+use netscript::App;
+
+fn main() -> std::io::Result<()> {
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() > 1 {
+        let input = &args[1];
+        let app = App::new();
+        let adapter = netscript::CliAdapter::new();
+        let tokens = adapter.run_once(input);
+        for token in tokens {
+            println!("{:?}", token);
+        }
+        Ok(())
+    } else {
+        App::new().run_cli()
+    }
 }
