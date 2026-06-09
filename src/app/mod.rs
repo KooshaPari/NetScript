@@ -49,7 +49,10 @@ mod tests {
         let app = App::default();
         let tokens = app.run_once("true");
         assert!(!tokens.is_empty());
-        assert_eq!(tokens[0].token_type, crate::domain::TokenType::Boolean(true));
+        assert_eq!(
+            tokens[0].token_type,
+            crate::domain::TokenType::Boolean(true)
+        );
     }
 
     #[test]
@@ -66,8 +69,6 @@ mod tests {
     fn test_app_run_cli() {
         let mut cmd = Command::cargo_bin("netscript").unwrap();
         cmd.write_stdin("42\n");
-        cmd.assert()
-            .success()
-            .stdout(contains("Integer(42)"));
+        cmd.assert().success().stdout(contains("Integer(42)"));
     }
 }

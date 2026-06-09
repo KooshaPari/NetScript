@@ -52,7 +52,7 @@ mod tests {
 
     #[test]
     fn test_file_adapter_default() {
-        let adapter = FileAdapter::default();
+        let adapter = FileAdapter;
         let _ = adapter;
     }
 

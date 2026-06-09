@@ -26,13 +26,16 @@ impl ReplAdapter {
     }
 
     pub fn run_interactive(&self) -> io::Result<()> {
-        let mut rl = DefaultEditor::new().map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
+        let mut rl = DefaultEditor::new().map_err(io::Error::other)?;
         let stdout = io::stdout();
         let mut stdout_lock = stdout.lock();
         let mut stderr = io::stderr();
 
         writeln!(stderr, "NetScript REPL (interactive mode)")?;
-        writeln!(stderr, "Type expressions and press Enter. Type .exit to quit.")?;
+        writeln!(
+            stderr,
+            "Type expressions and press Enter. Type .exit to quit."
+        )?;
 
         loop {
             let readline = rl.readline(&self.prompt);

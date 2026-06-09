@@ -141,7 +141,10 @@ impl Parser {
         let name = self.consume_identifier("expect variable name")?;
         self.consume(TokenType::Equals, "expect '=' after variable name")?;
         let initializer = self.expression()?;
-        self.consume(TokenType::Semicolon, "expect ';' after variable declaration")?;
+        self.consume(
+            TokenType::Semicolon,
+            "expect ';' after variable declaration",
+        )?;
         Ok(Stmt::Let { name, initializer })
     }
 
@@ -513,10 +516,20 @@ mod tests {
         assert!(result.is_ok());
         let program = result.unwrap();
         match &program.statements[0] {
-            Stmt::Expression(Expr::Binary { left, operator, right }) => {
-                assert!(matches!(left.as_ref(), Expr::Literal(LiteralValue::Integer(1))));
+            Stmt::Expression(Expr::Binary {
+                left,
+                operator,
+                right,
+            }) => {
+                assert!(matches!(
+                    left.as_ref(),
+                    Expr::Literal(LiteralValue::Integer(1))
+                ));
                 assert_eq!(*operator, BinaryOp::Plus);
-                assert!(matches!(right.as_ref(), Expr::Literal(LiteralValue::Integer(2))));
+                assert!(matches!(
+                    right.as_ref(),
+                    Expr::Literal(LiteralValue::Integer(2))
+                ));
             }
             other => panic!("Expected binary expression, got {:?}", other),
         }
@@ -530,7 +543,10 @@ mod tests {
         match &program.statements[0] {
             Stmt::Let { name, initializer } => {
                 assert_eq!(name, "x");
-                assert!(matches!(initializer, Expr::Literal(LiteralValue::Integer(42))));
+                assert!(matches!(
+                    initializer,
+                    Expr::Literal(LiteralValue::Integer(42))
+                ));
             }
             other => panic!("Expected let statement, got {:?}", other),
         }
@@ -542,8 +558,15 @@ mod tests {
         assert!(result.is_ok());
         let program = result.unwrap();
         match &program.statements[0] {
-            Stmt::If { condition, then_branch, else_branch } => {
-                assert!(matches!(condition, Expr::Literal(LiteralValue::Boolean(true))));
+            Stmt::If {
+                condition,
+                then_branch,
+                else_branch,
+            } => {
+                assert!(matches!(
+                    condition,
+                    Expr::Literal(LiteralValue::Boolean(true))
+                ));
                 assert!(matches!(then_branch.as_ref(), Stmt::Block(_)));
                 assert!(else_branch.is_none());
             }
@@ -557,15 +580,32 @@ mod tests {
         assert!(result.is_ok());
         let program = result.unwrap();
         match &program.statements[0] {
-            Stmt::Expression(Expr::Binary { left, operator, right }) => {
-                assert!(matches!(left.as_ref(), Expr::Literal(LiteralValue::Integer(1))));
+            Stmt::Expression(Expr::Binary {
+                left,
+                operator,
+                right,
+            }) => {
+                assert!(matches!(
+                    left.as_ref(),
+                    Expr::Literal(LiteralValue::Integer(1))
+                ));
                 assert_eq!(*operator, BinaryOp::Plus);
                 // right should be 2 * 3
                 match right.as_ref() {
-                    Expr::Binary { left: l, operator: op, right: r } => {
-                        assert!(matches!(l.as_ref(), Expr::Literal(LiteralValue::Integer(2))));
+                    Expr::Binary {
+                        left: l,
+                        operator: op,
+                        right: r,
+                    } => {
+                        assert!(matches!(
+                            l.as_ref(),
+                            Expr::Literal(LiteralValue::Integer(2))
+                        ));
                         assert_eq!(*op, BinaryOp::Star);
-                        assert!(matches!(r.as_ref(), Expr::Literal(LiteralValue::Integer(3))));
+                        assert!(matches!(
+                            r.as_ref(),
+                            Expr::Literal(LiteralValue::Integer(3))
+                        ));
                     }
                     other => panic!("Expected multiplication on right, got {:?}", other),
                 }
@@ -582,7 +622,10 @@ mod tests {
         match &program.statements[0] {
             Stmt::Expression(Expr::Unary { operator, operand }) => {
                 assert_eq!(*operator, UnaryOp::Bang);
-                assert!(matches!(operand.as_ref(), Expr::Literal(LiteralValue::Boolean(true))));
+                assert!(matches!(
+                    operand.as_ref(),
+                    Expr::Literal(LiteralValue::Boolean(true))
+                ));
             }
             other => panic!("Expected unary expression, got {:?}", other),
         }
@@ -594,7 +637,11 @@ mod tests {
         assert!(result.is_ok());
         let program = result.unwrap();
         match &program.statements[0] {
-            Stmt::Function { name, parameters, body } => {
+            Stmt::Function {
+                name,
+                parameters,
+                body,
+            } => {
                 assert_eq!(name, "add");
                 assert_eq!(parameters, &["a", "b"]);
                 assert!(matches!(body.as_ref(), Stmt::Block(_)));
@@ -612,7 +659,9 @@ mod tests {
             Stmt::Expression(Expr::Call { callee, arguments }) => {
                 assert!(matches!(callee.as_ref(), Expr::Identifier(name) if name == "foo"));
                 assert_eq!(arguments.len(), 1);
-                assert!(matches!(arguments[0], Expr::Literal(LiteralValue::String(ref s)) if s == "hello"));
+                assert!(
+                    matches!(arguments[0], Expr::Literal(LiteralValue::String(ref s)) if s == "hello")
+                );
             }
             other => panic!("Expected call expression, got {:?}", other),
         }
@@ -624,20 +673,35 @@ mod tests {
         assert!(result.is_ok());
         let program = result.unwrap();
         match &program.statements[0] {
-            Stmt::Expression(Expr::Binary { left, operator, right }) => {
+            Stmt::Expression(Expr::Binary {
+                left,
+                operator,
+                right,
+            }) => {
                 assert_eq!(*operator, BinaryOp::Star);
-                assert!(matches!(right.as_ref(), Expr::Literal(LiteralValue::Integer(3))));
+                assert!(matches!(
+                    right.as_ref(),
+                    Expr::Literal(LiteralValue::Integer(3))
+                ));
                 match left.as_ref() {
-                    Expr::Grouping(inner) => {
-                        match inner.as_ref() {
-                            Expr::Binary { left: l, operator: op, right: r } => {
-                                assert!(matches!(l.as_ref(), Expr::Literal(LiteralValue::Integer(1))));
-                                assert_eq!(*op, BinaryOp::Plus);
-                                assert!(matches!(r.as_ref(), Expr::Literal(LiteralValue::Integer(2))));
-                            }
-                            other => panic!("Expected grouped binary, got {:?}", other),
+                    Expr::Grouping(inner) => match inner.as_ref() {
+                        Expr::Binary {
+                            left: l,
+                            operator: op,
+                            right: r,
+                        } => {
+                            assert!(matches!(
+                                l.as_ref(),
+                                Expr::Literal(LiteralValue::Integer(1))
+                            ));
+                            assert_eq!(*op, BinaryOp::Plus);
+                            assert!(matches!(
+                                r.as_ref(),
+                                Expr::Literal(LiteralValue::Integer(2))
+                            ));
                         }
-                    }
+                        other => panic!("Expected grouped binary, got {:?}", other),
+                    },
                     other => panic!("Expected grouping, got {:?}", other),
                 }
             }
@@ -652,7 +716,10 @@ mod tests {
         let program = result.unwrap();
         match &program.statements[0] {
             Stmt::While { condition, body } => {
-                assert!(matches!(condition, Expr::Literal(LiteralValue::Boolean(true))));
+                assert!(matches!(
+                    condition,
+                    Expr::Literal(LiteralValue::Boolean(true))
+                ));
                 assert!(matches!(body.as_ref(), Stmt::Block(_)));
             }
             other => panic!("Expected while statement, got {:?}", other),

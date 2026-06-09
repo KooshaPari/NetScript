@@ -199,7 +199,13 @@ impl Lexer {
                 let num_str: String = self.input[start..self.position].iter().collect();
                 return i64::from_str_radix(&num_str[2..], 16)
                     .map(TokenType::Integer)
-                    .unwrap_or_else(|_| TokenType::Error(LexError::new("invalid hex literal", self.line, self.column)));
+                    .unwrap_or_else(|_| {
+                        TokenType::Error(LexError::new(
+                            "invalid hex literal",
+                            self.line,
+                            self.column,
+                        ))
+                    });
             } else if prefix == 'o' || prefix == 'O' {
                 self.read_char(); // consume '0'
                 self.read_char(); // consume 'o'
@@ -209,7 +215,13 @@ impl Lexer {
                 let num_str: String = self.input[start..self.position].iter().collect();
                 return i64::from_str_radix(&num_str[2..], 8)
                     .map(TokenType::Integer)
-                    .unwrap_or_else(|_| TokenType::Error(LexError::new("invalid octal literal", self.line, self.column)));
+                    .unwrap_or_else(|_| {
+                        TokenType::Error(LexError::new(
+                            "invalid octal literal",
+                            self.line,
+                            self.column,
+                        ))
+                    });
             } else if prefix == 'b' || prefix == 'B' {
                 self.read_char(); // consume '0'
                 self.read_char(); // consume 'b'
@@ -219,7 +231,13 @@ impl Lexer {
                 let num_str: String = self.input[start..self.position].iter().collect();
                 return i64::from_str_radix(&num_str[2..], 2)
                     .map(TokenType::Integer)
-                    .unwrap_or_else(|_| TokenType::Error(LexError::new("invalid binary literal", self.line, self.column)));
+                    .unwrap_or_else(|_| {
+                        TokenType::Error(LexError::new(
+                            "invalid binary literal",
+                            self.line,
+                            self.column,
+                        ))
+                    });
             }
         }
         while self.ch.is_ascii_digit() {
@@ -233,12 +251,24 @@ impl Lexer {
             let num_str: String = self.input[start..self.position].iter().collect();
             return f64::from_str(&num_str)
                 .map(TokenType::Float)
-                .unwrap_or_else(|_| TokenType::Error(LexError::new("invalid float literal", self.line, self.column)));
+                .unwrap_or_else(|_| {
+                    TokenType::Error(LexError::new(
+                        "invalid float literal",
+                        self.line,
+                        self.column,
+                    ))
+                });
         }
         let num_str: String = self.input[start..self.position].iter().collect();
         i64::from_str(&num_str)
             .map(TokenType::Integer)
-            .unwrap_or_else(|_| TokenType::Error(LexError::new("invalid integer literal", self.line, self.column)))
+            .unwrap_or_else(|_| {
+                TokenType::Error(LexError::new(
+                    "invalid integer literal",
+                    self.line,
+                    self.column,
+                ))
+            })
     }
 
     fn read_string(&mut self) -> String {
@@ -364,7 +394,10 @@ impl Lexer {
                 if self.ch.is_ascii_digit() {
                     let token_type = self.read_number();
                     return Token::new(token_type, self.line, self.column);
-                } else if self.ch.is_ascii_alphabetic() || self.ch == '_' || unicode_ident::is_xid_start(self.ch) {
+                } else if self.ch.is_ascii_alphabetic()
+                    || self.ch == '_'
+                    || unicode_ident::is_xid_start(self.ch)
+                {
                     let id = self.read_identifier();
                     let keyword = match id.as_str() {
                         "let" => TokenType::Let,

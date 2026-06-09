@@ -1,6 +1,5 @@
 use netscript::{Lexer, Loc, Span, TokenType};
 
-
 #[test]
 fn test_integer_token() {
     let input = "42";
@@ -189,6 +188,7 @@ fn test_comments_skipped() {
 }
 
 #[test]
+#[allow(clippy::approx_constant)]
 fn test_float_token() {
     let input = "3.14";
     let mut lexer = Lexer::new(input);
@@ -290,10 +290,13 @@ fn test_span_loc_struct() {
     let mut lexer = Lexer::new(input);
     let token = lexer.next_token();
     assert_eq!(token.token_type, TokenType::Let);
-    assert_eq!(token.span, Span {
-        start: Loc { line: 1, column: 4 },
-        end: Loc { line: 1, column: 4 },
-    });
+    assert_eq!(
+        token.span,
+        Span {
+            start: Loc { line: 1, column: 4 },
+            end: Loc { line: 1, column: 4 },
+        }
+    );
     assert_eq!(token.line(), 1);
     assert_eq!(token.column(), 4);
 }
