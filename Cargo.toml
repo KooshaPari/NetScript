@@ -20,3 +20,9 @@ cargo-fuzz = "0.12"
 [[bin]]
 name = "netscript"
 path = "src/main.rs"
+
+[lints.clippy]
+all = "warn"
+style = "warn"
+perf = "warn"
+complexity = "warn"
