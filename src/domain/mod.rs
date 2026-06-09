@@ -2,4 +2,4 @@
 
 pub mod lexer;
 
-pub use lexer::{Lexer, Token, TokenType};
+pub use lexer::{Lexer, Loc, Span, Token, TokenType};

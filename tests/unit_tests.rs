@@ -1,4 +1,5 @@
-use netscript::{Lexer, TokenType};
+use netscript::{Lexer, Loc, Span, TokenType};
+
 
 #[test]
 fn test_integer_token() {
@@ -281,6 +282,20 @@ fn test_binary_literal() {
     let mut lexer = Lexer::new(input);
     let token = lexer.next_token();
     assert_eq!(token.token_type, TokenType::Integer(10));
+}
+
+#[test]
+fn test_span_loc_struct() {
+    let input = "let x;";
+    let mut lexer = Lexer::new(input);
+    let token = lexer.next_token();
+    assert_eq!(token.token_type, TokenType::Let);
+    assert_eq!(token.span, Span {
+        start: Loc { line: 1, column: 4 },
+        end: Loc { line: 1, column: 4 },
+    });
+    assert_eq!(token.line(), 1);
+    assert_eq!(token.column(), 4);
 }
 
 #[test]

@@ -51,21 +51,45 @@ pub enum TokenType {
     Illegal,
 }
 
-// Token with position information
+// Source location
 #[derive(Debug, Clone, PartialEq)]
-pub struct Token {
-    pub token_type: TokenType,
+pub struct Loc {
     pub line: usize,
     pub column: usize,
 }
 
+// Source span from start to end location
+#[derive(Debug, Clone, PartialEq)]
+pub struct Span {
+    pub start: Loc,
+    pub end: Loc,
+}
+
+// Token with position information
+#[derive(Debug, Clone, PartialEq)]
+pub struct Token {
+    pub token_type: TokenType,
+    pub span: Span,
+}
+
 impl Token {
     pub fn new(token_type: TokenType, line: usize, column: usize) -> Self {
+        let loc = Loc { line, column };
         Self {
             token_type,
-            line,
-            column,
+            span: Span {
+                start: loc.clone(),
+                end: loc,
+            },
         }
+    }
+
+    pub fn line(&self) -> usize {
+        self.span.start.line
+    }
+
+    pub fn column(&self) -> usize {
+        self.span.start.column
     }
 }
 
