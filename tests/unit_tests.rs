@@ -305,3 +305,23 @@ fn test_overflow_returns_illegal() {
     let token = lexer.next_token();
     assert_eq!(token.token_type, TokenType::Illegal);
 }
+
+#[test]
+fn test_illegal_tokens() {
+    let cases = vec![
+        ("$", "dollar sign"),
+        ("@", "at sign"),
+        ("#", "hash sign"),
+        ("😀", "emoji"),
+    ];
+    for (input, desc) in cases {
+        let mut lexer = Lexer::new(input);
+        let token = lexer.next_token();
+        assert_eq!(
+            token.token_type,
+            TokenType::Illegal,
+            "Expected Illegal token for {}",
+            desc
+        );
+    }
+}
