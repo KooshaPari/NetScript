@@ -43,5 +43,5 @@ pub mod ports;
 
 pub use adapters::CliAdapter;
 pub use app::App;
-pub use domain::{LexError, Lexer, Loc, Span, Token, TokenType};
+pub use domain::{parse_source, BinaryOp, Expr, LexError, Lexer, LiteralValue, Loc, ParseError, Parser, Program, Span, Stmt, Token, TokenType, UnaryOp};
 pub use ports::{LexerPort, Tokenizer};
