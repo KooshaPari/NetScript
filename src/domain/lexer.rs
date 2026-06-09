@@ -174,6 +174,21 @@ impl Lexer {
         result
     }
 
+    fn skip_block_comment(&mut self) {
+        self.read_char(); // consume '*'
+        loop {
+            if self.ch == '*' && self.peek_char() == '/' {
+                self.read_char(); // consume '*'
+                self.read_char(); // consume '/'
+                break;
+            }
+            if self.ch == '\0' {
+                break;
+            }
+            self.read_char();
+        }
+    }
+
     fn skip_comment(&mut self) {
         while self.ch != '\n' && self.ch != '\0' {
             self.read_char();
@@ -190,6 +205,9 @@ impl Lexer {
             '/' => {
                 if self.peek_char() == '/' {
                     self.skip_comment();
+                    return self.next_token();
+                } else if self.peek_char() == '*' {
+                    self.skip_block_comment();
                     return self.next_token();
                 }
                 Token::new(TokenType::Slash, self.line, self.column)

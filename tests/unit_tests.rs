@@ -210,6 +210,34 @@ fn test_string_escape_sequences() {
 }
 
 #[test]
+fn test_block_comment_skipped() {
+    let input = "let x = 1; /* this is a block comment */ let y = 2;";
+    let mut lexer = Lexer::new(input);
+    let tokens: Vec<TokenType> = lexer
+        .tokenize()
+        .iter()
+        .map(|t| t.token_type.clone())
+        .collect();
+    assert!(tokens.contains(&TokenType::Let));
+    assert!(tokens.contains(&TokenType::Identifier("x".to_string())));
+    assert!(tokens.contains(&TokenType::Identifier("y".to_string())));
+}
+
+#[test]
+fn test_multi_line_block_comment() {
+    let input = "let x = 1; /* multi\nline */ let y = 2;";
+    let mut lexer = Lexer::new(input);
+    let tokens: Vec<TokenType> = lexer
+        .tokenize()
+        .iter()
+        .map(|t| t.token_type.clone())
+        .collect();
+    assert!(tokens.contains(&TokenType::Let));
+    assert!(tokens.contains(&TokenType::Identifier("x".to_string())));
+    assert!(tokens.contains(&TokenType::Identifier("y".to_string())));
+}
+
+#[test]
 fn test_overflow_returns_illegal() {
     let input = "999999999999999999999999999999";
     let mut lexer = Lexer::new(input);
