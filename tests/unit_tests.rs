@@ -260,6 +260,30 @@ fn test_unicode_identifier_mixed() {
 }
 
 #[test]
+fn test_hex_literal() {
+    let input = "0xFF";
+    let mut lexer = Lexer::new(input);
+    let token = lexer.next_token();
+    assert_eq!(token.token_type, TokenType::Integer(255));
+}
+
+#[test]
+fn test_octal_literal() {
+    let input = "0o77";
+    let mut lexer = Lexer::new(input);
+    let token = lexer.next_token();
+    assert_eq!(token.token_type, TokenType::Integer(63));
+}
+
+#[test]
+fn test_binary_literal() {
+    let input = "0b1010";
+    let mut lexer = Lexer::new(input);
+    let token = lexer.next_token();
+    assert_eq!(token.token_type, TokenType::Integer(10));
+}
+
+#[test]
 fn test_overflow_returns_illegal() {
     let input = "999999999999999999999999999999";
     let mut lexer = Lexer::new(input);

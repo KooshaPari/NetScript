@@ -134,6 +134,40 @@ impl Lexer {
 
     fn read_number(&mut self) -> TokenType {
         let start = self.position;
+        if self.ch == '0' {
+            let prefix = self.peek_char();
+            if prefix == 'x' || prefix == 'X' {
+                self.read_char(); // consume '0'
+                self.read_char(); // consume 'x'
+                while self.ch.is_ascii_hexdigit() {
+                    self.read_char();
+                }
+                let num_str: String = self.input[start..self.position].iter().collect();
+                return i64::from_str_radix(&num_str[2..], 16)
+                    .map(TokenType::Integer)
+                    .unwrap_or(TokenType::Illegal);
+            } else if prefix == 'o' || prefix == 'O' {
+                self.read_char(); // consume '0'
+                self.read_char(); // consume 'o'
+                while matches!(self.ch, '0'..='7') {
+                    self.read_char();
+                }
+                let num_str: String = self.input[start..self.position].iter().collect();
+                return i64::from_str_radix(&num_str[2..], 8)
+                    .map(TokenType::Integer)
+                    .unwrap_or(TokenType::Illegal);
+            } else if prefix == 'b' || prefix == 'B' {
+                self.read_char(); // consume '0'
+                self.read_char(); // consume 'b'
+                while matches!(self.ch, '0' | '1') {
+                    self.read_char();
+                }
+                let num_str: String = self.input[start..self.position].iter().collect();
+                return i64::from_str_radix(&num_str[2..], 2)
+                    .map(TokenType::Integer)
+                    .unwrap_or(TokenType::Illegal);
+            }
+        }
         while self.ch.is_ascii_digit() {
             self.read_char();
         }
