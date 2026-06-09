@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 // Token types for the NetScript lexer
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TokenType {
     // Literals
     Integer(i64),
@@ -49,7 +49,7 @@ pub enum TokenType {
 }
 
 // Token with position information
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Token {
     pub token_type: TokenType,
     pub line: usize,
