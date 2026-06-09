@@ -126,7 +126,7 @@ impl Lexer {
 
     fn read_identifier(&mut self) -> String {
         let start = self.position;
-        while self.ch.is_ascii_alphabetic() || self.ch == '_' {
+        while self.ch == '_' || unicode_ident::is_xid_continue(self.ch) {
             self.read_char();
         }
         self.input[start..self.position].iter().collect()
@@ -276,7 +276,7 @@ impl Lexer {
                 if self.ch.is_ascii_digit() {
                     let token_type = self.read_number();
                     return Token::new(token_type, self.line, self.column);
-                } else if self.ch.is_ascii_alphabetic() || self.ch == '_' {
+                } else if self.ch.is_ascii_alphabetic() || self.ch == '_' || unicode_ident::is_xid_start(self.ch) {
                     let id = self.read_identifier();
                     let keyword = match id.as_str() {
                         "let" => TokenType::Let,

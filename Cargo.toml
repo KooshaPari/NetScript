@@ -11,6 +11,7 @@ description = "Network scripting language and runtime"
 resolver = "2"
 
 [dependencies]
+unicode-ident = "1.0.14"
 
 [dev-dependencies]
 proptest = "1.6.0"

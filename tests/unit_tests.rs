@@ -238,6 +238,28 @@ fn test_multi_line_block_comment() {
 }
 
 #[test]
+fn test_unicode_identifier() {
+    let input = "变量";
+    let mut lexer = Lexer::new(input);
+    let token = lexer.next_token();
+    match token.token_type {
+        TokenType::Identifier(id) => assert_eq!(id, "变量"),
+        _ => panic!("Expected Identifier token, got {:?}", token.token_type),
+    }
+}
+
+#[test]
+fn test_unicode_identifier_mixed() {
+    let input = "变量_1";
+    let mut lexer = Lexer::new(input);
+    let token = lexer.next_token();
+    match token.token_type {
+        TokenType::Identifier(id) => assert_eq!(id, "变量_1"),
+        _ => panic!("Expected Identifier token, got {:?}", token.token_type),
+    }
+}
+
+#[test]
 fn test_overflow_returns_illegal() {
     let input = "999999999999999999999999999999";
     let mut lexer = Lexer::new(input);
