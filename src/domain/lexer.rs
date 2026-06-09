@@ -2,6 +2,26 @@ use std::str::FromStr;
 
 use crate::ports::LexerPort;
 
+// LexError with source span and message
+#[derive(Debug, Clone, PartialEq)]
+pub struct LexError {
+    pub span: Span,
+    pub message: String,
+}
+
+impl LexError {
+    pub fn new(message: impl Into<String>, line: usize, column: usize) -> Self {
+        let loc = Loc { line, column };
+        Self {
+            message: message.into(),
+            span: Span {
+                start: loc.clone(),
+                end: loc,
+            },
+        }
+    }
+}
+
 // Token types for the NetScript lexer
 #[derive(Debug, Clone, PartialEq)]
 pub enum TokenType {
@@ -48,7 +68,7 @@ pub enum TokenType {
 
     // Special
     Eof,
-    Illegal,
+    Error(LexError),
 }
 
 // Source location
@@ -80,6 +100,16 @@ impl Token {
             span: Span {
                 start: loc.clone(),
                 end: loc,
+            },
+        }
+    }
+
+    pub fn error(message: impl Into<String>, line: usize, column: usize) -> Self {
+        Self {
+            token_type: TokenType::Error(LexError::new(message, line, column)),
+            span: Span {
+                start: Loc { line, column },
+                end: Loc { line, column },
             },
         }
     }
@@ -169,7 +199,7 @@ impl Lexer {
                 let num_str: String = self.input[start..self.position].iter().collect();
                 return i64::from_str_radix(&num_str[2..], 16)
                     .map(TokenType::Integer)
-                    .unwrap_or(TokenType::Illegal);
+                    .unwrap_or_else(|_| TokenType::Error(LexError::new("invalid hex literal", self.line, self.column)));
             } else if prefix == 'o' || prefix == 'O' {
                 self.read_char(); // consume '0'
                 self.read_char(); // consume 'o'
@@ -179,7 +209,7 @@ impl Lexer {
                 let num_str: String = self.input[start..self.position].iter().collect();
                 return i64::from_str_radix(&num_str[2..], 8)
                     .map(TokenType::Integer)
-                    .unwrap_or(TokenType::Illegal);
+                    .unwrap_or_else(|_| TokenType::Error(LexError::new("invalid octal literal", self.line, self.column)));
             } else if prefix == 'b' || prefix == 'B' {
                 self.read_char(); // consume '0'
                 self.read_char(); // consume 'b'
@@ -189,7 +219,7 @@ impl Lexer {
                 let num_str: String = self.input[start..self.position].iter().collect();
                 return i64::from_str_radix(&num_str[2..], 2)
                     .map(TokenType::Integer)
-                    .unwrap_or(TokenType::Illegal);
+                    .unwrap_or_else(|_| TokenType::Error(LexError::new("invalid binary literal", self.line, self.column)));
             }
         }
         while self.ch.is_ascii_digit() {
@@ -203,12 +233,12 @@ impl Lexer {
             let num_str: String = self.input[start..self.position].iter().collect();
             return f64::from_str(&num_str)
                 .map(TokenType::Float)
-                .unwrap_or(TokenType::Illegal);
+                .unwrap_or_else(|_| TokenType::Error(LexError::new("invalid float literal", self.line, self.column)));
         }
         let num_str: String = self.input[start..self.position].iter().collect();
         i64::from_str(&num_str)
             .map(TokenType::Integer)
-            .unwrap_or(TokenType::Illegal)
+            .unwrap_or_else(|_| TokenType::Error(LexError::new("invalid integer literal", self.line, self.column)))
     }
 
     fn read_string(&mut self) -> String {
@@ -314,7 +344,7 @@ impl Lexer {
                     self.read_char();
                     Token::new(TokenType::And, self.line, self.column - 1)
                 } else {
-                    Token::new(TokenType::Illegal, self.line, self.column)
+                    Token::error("unexpected character '&'", self.line, self.column)
                 }
             }
             '|' => {
@@ -322,7 +352,7 @@ impl Lexer {
                     self.read_char();
                     Token::new(TokenType::Or, self.line, self.column - 1)
                 } else {
-                    Token::new(TokenType::Illegal, self.line, self.column)
+                    Token::error("unexpected character '|'", self.line, self.column)
                 }
             }
             '"' => {
@@ -350,7 +380,7 @@ impl Lexer {
                     };
                     return Token::new(keyword, self.line, self.column);
                 } else {
-                    Token::new(TokenType::Illegal, self.line, self.column)
+                    Token::error("unexpected character", self.line, self.column)
                 }
             }
         };

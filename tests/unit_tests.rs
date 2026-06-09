@@ -299,15 +299,19 @@ fn test_span_loc_struct() {
 }
 
 #[test]
-fn test_overflow_returns_illegal() {
+fn test_overflow_returns_error() {
     let input = "999999999999999999999999999999";
     let mut lexer = Lexer::new(input);
     let token = lexer.next_token();
-    assert_eq!(token.token_type, TokenType::Illegal);
+    assert!(
+        matches!(token.token_type, TokenType::Error(_)),
+        "Expected Error token, got {:?}",
+        token.token_type
+    );
 }
 
 #[test]
-fn test_illegal_tokens() {
+fn test_error_tokens() {
     let cases = vec![
         ("$", "dollar sign"),
         ("@", "at sign"),
@@ -317,10 +321,9 @@ fn test_illegal_tokens() {
     for (input, desc) in cases {
         let mut lexer = Lexer::new(input);
         let token = lexer.next_token();
-        assert_eq!(
-            token.token_type,
-            TokenType::Illegal,
-            "Expected Illegal token for {}",
+        assert!(
+            matches!(token.token_type, TokenType::Error(_)),
+            "Expected Error token for {}",
             desc
         );
     }
