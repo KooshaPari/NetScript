@@ -3,10 +3,11 @@ use std::str::FromStr;
 use crate::ports::LexerPort;
 
 // Token types for the NetScript lexer
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum TokenType {
     // Literals
     Integer(i64),
+    Float(f64),
     String(String),
     Identifier(String),
     Boolean(bool),
@@ -51,7 +52,7 @@ pub enum TokenType {
 }
 
 // Token with position information
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Token {
     pub token_type: TokenType,
     pub line: usize,
@@ -131,13 +132,25 @@ impl Lexer {
         self.input[start..self.position].iter().collect()
     }
 
-    fn read_number(&mut self) -> i64 {
+    fn read_number(&mut self) -> TokenType {
         let start = self.position;
         while self.ch.is_ascii_digit() {
             self.read_char();
         }
+        if self.ch == '.' && self.peek_char().is_ascii_digit() {
+            self.read_char(); // consume '.'
+            while self.ch.is_ascii_digit() {
+                self.read_char();
+            }
+            let num_str: String = self.input[start..self.position].iter().collect();
+            return f64::from_str(&num_str)
+                .map(TokenType::Float)
+                .unwrap_or(TokenType::Illegal);
+        }
         let num_str: String = self.input[start..self.position].iter().collect();
-        i64::from_str(&num_str).unwrap_or(0)
+        i64::from_str(&num_str)
+            .map(TokenType::Integer)
+            .unwrap_or(TokenType::Illegal)
     }
 
     fn read_string(&mut self) -> String {
@@ -232,8 +245,8 @@ impl Lexer {
             '\0' => Token::new(TokenType::Eof, self.line, self.column),
             _ => {
                 if self.ch.is_ascii_digit() {
-                    let num = self.read_number();
-                    return Token::new(TokenType::Integer(num), self.line, self.column);
+                    let token_type = self.read_number();
+                    return Token::new(token_type, self.line, self.column);
                 } else if self.ch.is_ascii_alphabetic() || self.ch == '_' {
                     let id = self.read_identifier();
                     let keyword = match id.as_str() {

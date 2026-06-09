@@ -186,3 +186,22 @@ fn test_comments_skipped() {
     assert!(tokens.contains(&TokenType::Identifier("x".to_string())));
     assert!(tokens.contains(&TokenType::Identifier("y".to_string())));
 }
+
+#[test]
+fn test_float_token() {
+    let input = "3.14";
+    let mut lexer = Lexer::new(input);
+    let token = lexer.next_token();
+    match token.token_type {
+        TokenType::Float(f) => assert!((f - 3.14).abs() < f64::EPSILON),
+        _ => panic!("Expected Float token, got {:?}", token.token_type),
+    }
+}
+
+#[test]
+fn test_overflow_returns_illegal() {
+    let input = "999999999999999999999999999999";
+    let mut lexer = Lexer::new(input);
+    let token = lexer.next_token();
+    assert_eq!(token.token_type, TokenType::Illegal);
+}
