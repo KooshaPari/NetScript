@@ -17,6 +17,8 @@ unicode-ident = "1.0.14"
 proptest = "1.6.0"
 insta = { version = "1.42.0", features = ["yaml"] }
 cargo-fuzz = "0.12"
+assert_cmd = "2.0"
+predicates = "3.1"
 
 [[bin]]
 name = "netscript"
