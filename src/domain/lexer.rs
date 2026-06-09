@@ -1,5 +1,7 @@
 use std::str::FromStr;
 
+use crate::ports::LexerPort;
+
 // Token types for the NetScript lexer
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TokenType {
@@ -267,5 +269,15 @@ impl Lexer {
             }
         }
         tokens
+    }
+}
+
+impl LexerPort for Lexer {
+    fn next_token(&mut self) -> Token {
+        Lexer::next_token(self)
+    }
+
+    fn tokenize(&mut self) -> Vec<Token> {
+        Lexer::tokenize(self)
     }
 }
