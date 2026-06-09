@@ -199,6 +199,17 @@ fn test_float_token() {
 }
 
 #[test]
+fn test_string_escape_sequences() {
+    let input = "\"hello\\nworld\\ttab\\\\quote\\\"\"";
+    let mut lexer = Lexer::new(input);
+    let token = lexer.next_token();
+    match token.token_type {
+        TokenType::String(s) => assert_eq!(s, "hello\nworld\ttab\\quote\""),
+        _ => panic!("Expected String token, got {:?}", token.token_type),
+    }
+}
+
+#[test]
 fn test_overflow_returns_illegal() {
     let input = "999999999999999999999999999999";
     let mut lexer = Lexer::new(input);

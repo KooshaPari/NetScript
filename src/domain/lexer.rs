@@ -154,13 +154,24 @@ impl Lexer {
     }
 
     fn read_string(&mut self) -> String {
-        let start_pos = self.position + 1;
+        let mut result = String::new();
         self.read_char(); // consume opening quote
         while self.ch != '"' && self.ch != '\0' {
+            if self.ch == '\\' {
+                self.read_char();
+                match self.ch {
+                    'n' => result.push('\n'),
+                    't' => result.push('\t'),
+                    '\\' => result.push('\\'),
+                    '"' => result.push('"'),
+                    _ => result.push(self.ch),
+                }
+            } else {
+                result.push(self.ch);
+            }
             self.read_char();
         }
-        let end_pos = self.position;
-        self.input[start_pos..end_pos].iter().collect()
+        result
     }
 
     fn skip_comment(&mut self) {
