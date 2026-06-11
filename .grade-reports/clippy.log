@@ -1,0 +1,12 @@
+[1m[33mwarning[0m: netscript v0.1.0 (/Users/kooshapari/CodeProjects/Phenotype/repos/NetScript) ignoring invalid dependency `cargo-fuzz` which is missing a lib target
+[1m[92m    Checking[0m netscript v0.1.0 (/Users/kooshapari/CodeProjects/Phenotype/repos/NetScript)
+[1m[33mwarning[0m[1m: the MSRV in `clippy.toml` and `Cargo.toml` differ; using `1.82.0` from `clippy.toml`[0m
+
+[1m[33mwarning[0m: `netscript` (lib) generated 1 warning
+[1m[33mwarning[0m: `netscript` (bin "netscript" test) generated 1 warning (1 duplicate)
+[1m[33mwarning[0m: `netscript` (lib test) generated 1 warning (1 duplicate)
+[1m[33mwarning[0m: `netscript` (bin "netscript") generated 1 warning (1 duplicate)
+[1m[33mwarning[0m: `netscript` (test "proptest_lexer") generated 1 warning (1 duplicate)
+[1m[33mwarning[0m: `netscript` (test "snapshot_tests") generated 1 warning (1 duplicate)
+[1m[33mwarning[0m: `netscript` (test "unit_tests") generated 1 warning (1 duplicate)
+[1m[92m    Finished[0m ]8;;https://doc.rust-lang.org/cargo/reference/profiles.html#default-profiles\`dev` profile [unoptimized + debuginfo]]8;;\ target(s) in 3.22s

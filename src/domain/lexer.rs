@@ -1,10 +1,33 @@
 use std::str::FromStr;
 
+use crate::ports::LexerPort;
+
+// LexError with source span and message
+#[derive(Debug, Clone, PartialEq)]
+pub struct LexError {
+    pub span: Span,
+    pub message: String,
+}
+
+impl LexError {
+    pub fn new(message: impl Into<String>, line: usize, column: usize) -> Self {
+        let loc = Loc { line, column };
+        Self {
+            message: message.into(),
+            span: Span {
+                start: loc.clone(),
+                end: loc,
+            },
+        }
+    }
+}
+
 // Token types for the NetScript lexer
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum TokenType {
     // Literals
     Integer(i64),
+    Float(f64),
     String(String),
     Identifier(String),
     Boolean(bool),
@@ -45,24 +68,58 @@ pub enum TokenType {
 
     // Special
     Eof,
-    Illegal,
+    Error(LexError),
 }
 
-// Token with position information
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Token {
-    pub token_type: TokenType,
+// Source location
+#[derive(Debug, Clone, PartialEq)]
+pub struct Loc {
     pub line: usize,
     pub column: usize,
 }
 
+// Source span from start to end location
+#[derive(Debug, Clone, PartialEq)]
+pub struct Span {
+    pub start: Loc,
+    pub end: Loc,
+}
+
+// Token with position information
+#[derive(Debug, Clone, PartialEq)]
+pub struct Token {
+    pub token_type: TokenType,
+    pub span: Span,
+}
+
 impl Token {
     pub fn new(token_type: TokenType, line: usize, column: usize) -> Self {
+        let loc = Loc { line, column };
         Self {
             token_type,
-            line,
-            column,
+            span: Span {
+                start: loc.clone(),
+                end: loc,
+            },
         }
+    }
+
+    pub fn error(message: impl Into<String>, line: usize, column: usize) -> Self {
+        Self {
+            token_type: TokenType::Error(LexError::new(message, line, column)),
+            span: Span {
+                start: Loc { line, column },
+                end: Loc { line, column },
+            },
+        }
+    }
+
+    pub fn line(&self) -> usize {
+        self.span.start.line
+    }
+
+    pub fn column(&self) -> usize {
+        self.span.start.column
     }
 }
 
@@ -123,29 +180,131 @@ impl Lexer {
 
     fn read_identifier(&mut self) -> String {
         let start = self.position;
-        while self.ch.is_ascii_alphabetic() || self.ch == '_' {
+        while self.ch == '_' || unicode_ident::is_xid_continue(self.ch) {
             self.read_char();
         }
         self.input[start..self.position].iter().collect()
     }
 
-    fn read_number(&mut self) -> i64 {
+    fn read_number(&mut self) -> TokenType {
         let start = self.position;
+        if self.ch == '0' {
+            let prefix = self.peek_char();
+            if prefix == 'x' || prefix == 'X' {
+                self.read_char(); // consume '0'
+                self.read_char(); // consume 'x'
+                while self.ch.is_ascii_hexdigit() {
+                    self.read_char();
+                }
+                let num_str: String = self.input[start..self.position].iter().collect();
+                return i64::from_str_radix(&num_str[2..], 16)
+                    .map(TokenType::Integer)
+                    .unwrap_or_else(|_| {
+                        TokenType::Error(LexError::new(
+                            "invalid hex literal",
+                            self.line,
+                            self.column,
+                        ))
+                    });
+            } else if prefix == 'o' || prefix == 'O' {
+                self.read_char(); // consume '0'
+                self.read_char(); // consume 'o'
+                while matches!(self.ch, '0'..='7') {
+                    self.read_char();
+                }
+                let num_str: String = self.input[start..self.position].iter().collect();
+                return i64::from_str_radix(&num_str[2..], 8)
+                    .map(TokenType::Integer)
+                    .unwrap_or_else(|_| {
+                        TokenType::Error(LexError::new(
+                            "invalid octal literal",
+                            self.line,
+                            self.column,
+                        ))
+                    });
+            } else if prefix == 'b' || prefix == 'B' {
+                self.read_char(); // consume '0'
+                self.read_char(); // consume 'b'
+                while matches!(self.ch, '0' | '1') {
+                    self.read_char();
+                }
+                let num_str: String = self.input[start..self.position].iter().collect();
+                return i64::from_str_radix(&num_str[2..], 2)
+                    .map(TokenType::Integer)
+                    .unwrap_or_else(|_| {
+                        TokenType::Error(LexError::new(
+                            "invalid binary literal",
+                            self.line,
+                            self.column,
+                        ))
+                    });
+            }
+        }
         while self.ch.is_ascii_digit() {
             self.read_char();
         }
+        if self.ch == '.' && self.peek_char().is_ascii_digit() {
+            self.read_char(); // consume '.'
+            while self.ch.is_ascii_digit() {
+                self.read_char();
+            }
+            let num_str: String = self.input[start..self.position].iter().collect();
+            return f64::from_str(&num_str)
+                .map(TokenType::Float)
+                .unwrap_or_else(|_| {
+                    TokenType::Error(LexError::new(
+                        "invalid float literal",
+                        self.line,
+                        self.column,
+                    ))
+                });
+        }
         let num_str: String = self.input[start..self.position].iter().collect();
-        i64::from_str(&num_str).unwrap_or(0)
+        i64::from_str(&num_str)
+            .map(TokenType::Integer)
+            .unwrap_or_else(|_| {
+                TokenType::Error(LexError::new(
+                    "invalid integer literal",
+                    self.line,
+                    self.column,
+                ))
+            })
     }
 
     fn read_string(&mut self) -> String {
-        let start_pos = self.position + 1;
+        let mut result = String::new();
         self.read_char(); // consume opening quote
         while self.ch != '"' && self.ch != '\0' {
+            if self.ch == '\\' {
+                self.read_char();
+                match self.ch {
+                    'n' => result.push('\n'),
+                    't' => result.push('\t'),
+                    '\\' => result.push('\\'),
+                    '"' => result.push('"'),
+                    _ => result.push(self.ch),
+                }
+            } else {
+                result.push(self.ch);
+            }
             self.read_char();
         }
-        let end_pos = self.position;
-        self.input[start_pos..end_pos].iter().collect()
+        result
+    }
+
+    fn skip_block_comment(&mut self) {
+        self.read_char(); // consume '*'
+        loop {
+            if self.ch == '*' && self.peek_char() == '/' {
+                self.read_char(); // consume '*'
+                self.read_char(); // consume '/'
+                break;
+            }
+            if self.ch == '\0' {
+                break;
+            }
+            self.read_char();
+        }
     }
 
     fn skip_comment(&mut self) {
@@ -164,6 +323,9 @@ impl Lexer {
             '/' => {
                 if self.peek_char() == '/' {
                     self.skip_comment();
+                    return self.next_token();
+                } else if self.peek_char() == '*' {
+                    self.skip_block_comment();
                     return self.next_token();
                 }
                 Token::new(TokenType::Slash, self.line, self.column)
@@ -212,7 +374,7 @@ impl Lexer {
                     self.read_char();
                     Token::new(TokenType::And, self.line, self.column - 1)
                 } else {
-                    Token::new(TokenType::Illegal, self.line, self.column)
+                    Token::error("unexpected character '&'", self.line, self.column)
                 }
             }
             '|' => {
@@ -220,7 +382,7 @@ impl Lexer {
                     self.read_char();
                     Token::new(TokenType::Or, self.line, self.column - 1)
                 } else {
-                    Token::new(TokenType::Illegal, self.line, self.column)
+                    Token::error("unexpected character '|'", self.line, self.column)
                 }
             }
             '"' => {
@@ -230,9 +392,12 @@ impl Lexer {
             '\0' => Token::new(TokenType::Eof, self.line, self.column),
             _ => {
                 if self.ch.is_ascii_digit() {
-                    let num = self.read_number();
-                    return Token::new(TokenType::Integer(num), self.line, self.column);
-                } else if self.ch.is_ascii_alphabetic() || self.ch == '_' {
+                    let token_type = self.read_number();
+                    return Token::new(token_type, self.line, self.column);
+                } else if self.ch.is_ascii_alphabetic()
+                    || self.ch == '_'
+                    || unicode_ident::is_xid_start(self.ch)
+                {
                     let id = self.read_identifier();
                     let keyword = match id.as_str() {
                         "let" => TokenType::Let,
@@ -248,7 +413,7 @@ impl Lexer {
                     };
                     return Token::new(keyword, self.line, self.column);
                 } else {
-                    Token::new(TokenType::Illegal, self.line, self.column)
+                    Token::error("unexpected character", self.line, self.column)
                 }
             }
         };
@@ -267,5 +432,15 @@ impl Lexer {
             }
         }
         tokens
+    }
+}
+
+impl LexerPort for Lexer {
+    fn next_token(&mut self) -> Token {
+        Lexer::next_token(self)
+    }
+
+    fn tokenize(&mut self) -> Vec<Token> {
+        Lexer::tokenize(self)
     }
 }

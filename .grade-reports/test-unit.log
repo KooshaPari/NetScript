@@ -1,0 +1,55 @@
+[1m[33mwarning[0m: netscript v0.1.0 (/Users/kooshapari/CodeProjects/Phenotype/repos/NetScript) ignoring invalid dependency `cargo-fuzz` which is missing a lib target
+[1m[92m    Finished[0m ]8;;https://doc.rust-lang.org/cargo/reference/profiles.html#default-profiles\`test` profile [unoptimized + debuginfo]]8;;\ target(s) in 0.96s
+[1m[92m     Running[0m unittests src/lib.rs (target/debug/deps/netscript-f5a89c5d6fc0a3b4)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+[1m[92m     Running[0m unittests src/main.rs (target/debug/deps/netscript-c96e28d34640de06)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+[1m[92m     Running[0m tests/proptest_lexer.rs (target/debug/deps/proptest_lexer-0e7ff725ce9d73c1)
+
+running 3 tests
+test integer_tokenization ... ok
+test lexer_never_panics_on_any_input ... ok
+test lexer_always_ends_with_eof ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+
+[1m[92m     Running[0m tests/snapshot_tests.rs (target/debug/deps/snapshot_tests-4bc5b3d32640dbac)
+
+running 3 tests
+test snapshot_if_statement ... ok
+test snapshot_function_call ... ok
+test snapshot_simple_assignment ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+
+[1m[92m     Running[0m tests/unit_tests.rs (target/debug/deps/unit_tests-ebfff5a2afec3362)
+
+running 11 tests
+test test_delimiters ... ok
+test test_comments_skipped ... ok
+test test_booleans ... ok
+test test_function_call ... ok
+test test_identifier ... ok
+test test_if_statement ... ok
+test test_integer_token ... ok
+test test_keywords ... ok
+test test_operators ... ok
+test test_simple_assignment ... ok
+test test_string_token ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+[1m[92m   Doc-tests[0m netscript
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

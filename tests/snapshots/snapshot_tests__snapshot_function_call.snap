@@ -1,38 +1,87 @@
 ---
 source: tests/snapshot_tests.rs
+assertion_line: 15
 expression: tokens
 ---
 [
     Token {
         token_type: Print,
-        line: 1,
-        column: 6,
+        span: Span {
+            start: Loc {
+                line: 1,
+                column: 6,
+            },
+            end: Loc {
+                line: 1,
+                column: 6,
+            },
+        },
     },
     Token {
         token_type: LeftParen,
-        line: 1,
-        column: 6,
+        span: Span {
+            start: Loc {
+                line: 1,
+                column: 6,
+            },
+            end: Loc {
+                line: 1,
+                column: 6,
+            },
+        },
     },
     Token {
         token_type: String(
             "hello",
         ),
-        line: 1,
-        column: 13,
+        span: Span {
+            start: Loc {
+                line: 1,
+                column: 13,
+            },
+            end: Loc {
+                line: 1,
+                column: 13,
+            },
+        },
     },
     Token {
         token_type: RightParen,
-        line: 1,
-        column: 14,
+        span: Span {
+            start: Loc {
+                line: 1,
+                column: 14,
+            },
+            end: Loc {
+                line: 1,
+                column: 14,
+            },
+        },
     },
     Token {
         token_type: Semicolon,
-        line: 1,
-        column: 15,
+        span: Span {
+            start: Loc {
+                line: 1,
+                column: 15,
+            },
+            end: Loc {
+                line: 1,
+                column: 15,
+            },
+        },
     },
     Token {
         token_type: Eof,
-        line: 1,
-        column: 16,
+        span: Span {
+            start: Loc {
+                line: 1,
+                column: 16,
+            },
+            end: Loc {
+                line: 1,
+                column: 16,
+            },
+        },
     },
 ]

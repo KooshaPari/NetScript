@@ -11,11 +11,21 @@ description = "Network scripting language and runtime"
 resolver = "2"
 
 [dependencies]
+unicode-ident = "1.0.14"
+rustyline = "14.0"
 
 [dev-dependencies]
 proptest = "1.6.0"
 insta = { version = "1.42.0", features = ["yaml"] }
 cargo-fuzz = "0.12"
+assert_cmd = "2.0"
+predicates = "3.1"
+tempfile = "3.10"
+criterion = "0.5"
+
+[[bench]]
+name = "lexer_benchmark"
+harness = false
 
 [[bin]]
 name = "netscript"
