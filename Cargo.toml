@@ -21,7 +21,7 @@ cargo-fuzz = "0.12"
 assert_cmd = "2.0"
 predicates = "3.1"
 tempfile = "3.10"
-criterion = "0.5"
+criterion = "0.8"
 
 [[bench]]
 name = "lexer_benchmark"
